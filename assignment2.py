@@ -280,7 +280,150 @@ X_subset, y_subset = X_test2, y_test2
 # =============================================================================
 
 def question_five():
+    """Using X_train2 and y_train2 from the preceeding cell, train a
+    DecisionTreeClassifier with default parameters and random_state=0. What
+    are the 5 most important features found by the decision tree?
+    
+    As a reminder, the feature names are available in the X_train2.columns
+    property, and the order of the features in X_train2.columns matches the
+    order of the feature importance values in the classifier's
+    feature_importances_ property.
+    
+    This function should return a list of length 5 containing the feature
+    names in descending order of importance.
+    
+    Note: remember that you also need to set random_state in the
+    DecisionTreeClassifier."""
+    
     from sklearn.tree import DecisionTreeClassifier
+    
+    tree = DecisionTreeClassifier(random_state=0).fit(X_train2, y_train2)
+    
+    features = pd.Series(
+        data=tree.feature_importances_,
+        index=X_mush.columns
+        ).sort_values(ascending=False
+        ).head().index.tolist()
+    
+    return features
 
-                                      
-                                          
+
+# =============================================================================
+# QUESTION SIX
+# =============================================================================
+
+def answer_six():
+    """
+    For this question, we're going to use the validation_curve function in
+    sklearn.model_selection to determine training and test scores for a
+    Support Vector Classifier (SVC) with varying parameter values. Recall
+    that the validation_curve function, in addition to taking an initialized
+    unfitted classifier object, takes a dataset as input and does its own
+    internal train-test splits to compute results.
+    
+    Because creating a validation curve requires fitting multiple models, for
+    performance reasons this question will use just a subset of the original
+    mushroom dataset: please use the variables X_subset and y_subset as
+    input to the validation curve function (instead of X_mush and y_mush) to
+    reduce computation time.
+    
+    The initialized unfitted classifier object we'll be using is a Support
+    Vector Classifier with radial basis kernel. So your first step is to
+    create an SVC object with default parameters (i.e. kernel='rbf', C=1) and
+    random_state=0. Recall that the kernel width of the RBF kernel is
+    controlled using the gamma parameter.
+    
+    With this classifier, and the dataset in X_subset, y_subset, explore the
+    effect of gamma on classifier accuracy by using the validation_curve
+    function to find the training and test scores for 6 values of gamma from
+    0.0001 to 10 (i.e. np.logspace(-4,1,6)). Recall that you can specify what
+    scoring metric you want validation_curve to use by setting the "scoring"
+    parameter. In this case, we want to use "accuracy" as the scoring metric.
+    
+    For each level of gamma, validation_curve will fit 3 models on different
+    subsets of the data, returning two 6x3 (6 levels of gamma x 3 fits per
+    level) arrays of the scores for the training and test sets.
+    
+    Find the mean score across the three models for each level of gamma for
+    both arrays, creating two arrays of length 6, and return a tuple with the
+    two arrays.
+
+    e.g. if one of your array of scores is
+
+        array([[ 0.5,  0.4,  0.6],
+               [ 0.7,  0.8,  0.7],
+               [ 0.9,  0.8,  0.8],
+               [ 0.8,  0.7,  0.8],
+               [ 0.7,  0.6,  0.6],
+               [ 0.4,  0.6,  0.5]])
+
+    it should then become
+
+        array([ 0.5,  0.73333333,  0.83333333,  0.76666667,  0.63333333, 0.5])
+
+    This function should return one tuple of numpy arrays (training_scores,
+    test_scores) where each array in the tuple has shape (6,).
+    """
+    
+    from sklearn.svm import SVC
+    from sklearn.model_selection import validation_curve
+
+    clf = SVC(kernel='rbf', C=1.0, random_state=0).fit(X_mush, y_mush)
+
+    train_scores, test_scores = validation_curve(
+        clf,
+        X_subset, y_subset,
+        param_name='gamma',
+        param_range=np.logspace(-4,1,6))
+    
+    return np.mean(train_scores, axis=1), np.mean(test_scores, axis=1)
+        
+# =============================================================================
+# QUESTION 7
+# =============================================================================
+    
+def answer_seven():
+    """ Based on the scores from question 6, what gamma value corresponds to a
+    model that is underfitting (and has the worst test set accuracy)? What
+    gamma value corresponds to a model that is overfitting (and has the worst
+    test set accuracy)? What choice of gamma would be the best choice for a 
+    model with good generalization performance on this dataset (high accuracy
+    on both training and test set)?
+    
+    Hint: Try plotting the scores from question 6 to visualize the
+    relationship between gamma and accuracy. Remember to comment out the
+    import matplotlib line before submission.
+    
+    This function should return one tuple with the degree values in this
+    order: (Underfitting, Overfitting, Good_Generalization) Please note
+    there is only one correct solution.
+    """
+    fits = answer_six()
+        
+    bar_width = 0.4
+    
+    train_scores_x = np.arange(6)
+    test_scores_x = [score + bar_width for score in np.arange(6)]
+    
+    plt.bar(train_scores_x, fits[0], width=bar_width)
+    plt.bar(test_scores_x, fits[1], width=bar_width)
+    
+    plt.xticks(
+        [r + bar_width for r in range(6)],
+        np.arange(6))
+        
+    good = 3
+    under = 0
+    over = 5
+    
+    gamma = np.logspace(-4,1,6)
+    return gamma[under], gamma[over], gamma[good]
+
+print(answer_seven())
+
+    
+    
+                                                           
+                                                           
+                                                           
+                                                           
