@@ -26,7 +26,7 @@ knn = KNeighborsClassifier(n_neighbors=5)
 
 knn.fit(X_train, Y_train)
 
-prediction = knn.predict([[100, 6.3, 118.5, .2]])[0]
-print(lookup_fruit_name[prediction])
+print(knn.score(X_test, Y_test))
 
+print(knn.predict([[20, 4.3, 5.5]])
 
