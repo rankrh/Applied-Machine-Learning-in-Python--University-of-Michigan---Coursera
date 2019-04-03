@@ -148,8 +148,36 @@ def answer_five():
     return recall75, true_positive16
 
 
-print(answer_five())
+# =============================================================================
+# Question 6
+# =============================================================================
 
+"""Perform a grid search over the parameters listed below for a Logisitic
+Regression classifier, using recall for scoring and the default 3-fold cross
+validation.
+
+    'penalty': ['l1', 'l2']
+    'C':[0.01, 0.1, 1, 10, 100]
+
+From .cv_results_, create an array of the mean test scores of each parameter
+combination.This function should return a 5 by 2 numpy array with 10 floats.
+"""
+
+def answer_six():
+    from sklearn.model_selection import GridSearchCV
+    from sklearn.linear_model import LogisticRegression
+
+    logistic = LogisticRegression()
+    param_grid = {
+        'penalty': ['l1', 'l2'],
+        'C':[0.01, 0.1, 1, 10, 100]}
+    
+    grid = GridSearchCV(logistic, param_grid=param_grid)
+    
+    return grid
+        
+    
+print(answer_six())
 
 
 
